@@ -3,29 +3,40 @@
   "colors": {
     "primary": "#10b981",
     "light": "#34d399",
-    "dark": "#059669"
+    "dark": "#4f46e5"
   },
-  "topbarLinks": [
-    {
-      "name": "Dashboard",
-      "url": "https://app.nullbridge.ai"
-    }
-  ],
-  "topbarCtaButton": {
-    "name": "Get Access",
-    "url": "mailto:brian@nullbridge.ai"
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Docs",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": ["introduction", "quickstart"]
+          },
+          {
+            "group": "Reference",
+            "pages": ["sdk-reference", "dashboard", "alerts"]
+          }
+        ]
+      }
+    ]
   },
-  "navigation": [
-    {
-      "group": "Getting Started",
-      "pages": ["introduction", "quickstart"]
-    },
-    {
-      "group": "Reference",
-      "pages": ["sdk-reference", "dashboard", "alerts"]
+  "topbar": {
+    "links": [
+      {
+        "name": "Dashboard",
+        "url": "https://app.nullbridge.ai"
+      }
+    ],
+    "cta": {
+      "name": "Get Access",
+      "url": "mailto:brian@nullbridge.ai"
     }
-  ],
-  "footerSocials": {
-    "website": "https://nullbridge.ai"
+  },
+  "footer": {
+    "socials": {
+      "website": "https://nullbridge.ai"
+    }
   }
 }
