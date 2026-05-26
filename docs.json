@@ -1,4 +1,6 @@
 {
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
   "name": "NullBridge",
   "colors": {
     "primary": "#10b981",
@@ -25,14 +27,14 @@
   "navbar": {
     "links": [
       {
-        "name": "Dashboard",
-        "url": "https://app.nullbridge.ai"
+        "label": "Dashboard",
+        "href": "https://app.nullbridge.ai"
       }
     ],
     "primary": {
       "type": "button",
-      "name": "Get Access",
-      "url": "mailto:brian@nullbridge.ai"
+      "label": "Get Access",
+      "href": "mailto:brian@nullbridge.ai"
     }
   },
   "footer": {
