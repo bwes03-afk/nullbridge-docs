@@ -22,14 +22,15 @@
       }
     ]
   },
-  "topbar": {
+  "navbar": {
     "links": [
       {
         "name": "Dashboard",
         "url": "https://app.nullbridge.ai"
       }
     ],
-    "cta": {
+    "primary": {
+      "type": "button",
       "name": "Get Access",
       "url": "mailto:brian@nullbridge.ai"
     }
