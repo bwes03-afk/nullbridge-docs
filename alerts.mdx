@@ -1,0 +1,83 @@
+---
+title: Email Alerts
+description: Configure kill switch and anomaly notifications
+---
+
+## Setup
+
+### 1. Set Your Notification Email
+
+Go to [app.nullbridge.ai](https://app.nullbridge.ai) → **Settings** → **Notifications** → enter your email → click **Save Changes**.
+
+### 2. Enable Alert Types
+
+| Toggle | When it fires |
+|--------|--------------|
+| **Alert on Critical Events** | Kill switch activated, critical anomaly, T4 auto-suspended |
+| **Alert on Warnings** | Anomaly warning below suspend threshold |
+| **Alert on Agent Suspension** | Any agent suspended |
+
+---
+
+## Alert Types
+
+### ⚡ Kill Switch
+
+**Subject:** `⚡ Kill Switch — [Agent Name] | NullBridge`
+
+Fires when an operator activates the kill switch. Contains agent name, operator, tier, environment, and timestamp.
+
+### ⚠️ Agent Suspended
+
+**Subject:** `⚠️ Agent Suspended — [Agent Name] | NullBridge`
+
+Fires when any agent is suspended manually or by the anomaly engine.
+
+### 🚨 Anomaly Detected
+
+**Subject:** `🚨 Critical Anomaly — [Agent Name] | NullBridge`
+
+Fires when the anomaly engine detects unusual behavior. Contains metric, current value, baseline mean, and z-score.
+
+### ✅ Agent Restored
+
+**Subject:** `✅ Agent Restored — [Agent Name] | NullBridge`
+
+Fires when a suspended agent is restored to active status.
+
+---
+
+## Anomaly Detection
+
+### Thresholds
+
+| Threshold | Default | Effect |
+|-----------|---------|--------|
+| Warning (σ) | 2.0 | SIEM warning logged, email sent if enabled |
+| Auto-Suspend (σ) | 3.0 | Agent suspended, critical email sent |
+
+### Recording Metrics via SDK
+
+```javascript
+nb.anomaly.record(agent.id, 'api_calls_per_minute', 14);
+nb.anomaly.record(agent.id, 'tokens_used', 3200);
+
+nb.anomaly.onAlert(alert => {
+  console.error(`Anomaly: ${alert.metric} — z=${alert.zScore}`);
+});
+```
+
+---
+
+## Testing
+
+1. Set notification email in Settings
+2. Enable **Alert on Critical Events**
+3. Kill any test agent in the Agent Registry
+4. Check your inbox — alert arrives within seconds
+
+---
+
+## Support
+
+Contact [brian@nullbridge.ai](mailto:brian@nullbridge.ai) for help.

@@ -1,0 +1,60 @@
+---
+title: Introduction
+description: AI Agent Identity Governance for modern teams
+---
+
+# What is NullBridge?
+
+NullBridge gives your AI agents a cryptographic identity, secure credential vault, continuous audit trail, and behavioral anomaly detection — in three lines of code.
+
+As AI agents proliferate across your organization, NullBridge answers the question: **who authorized this agent, what can it access, and what has it done?**
+
+## The Problem
+
+AI agents are being deployed faster than governance frameworks can keep up. Most organizations have no answer to:
+
+- Which agents are running in production right now?
+- Who approved them and why?
+- What credentials do they hold?
+- Has any agent behaved anomalously?
+- How do you revoke access instantly if something goes wrong?
+
+## The Solution
+
+NullBridge provides a complete identity governance layer for AI agents:
+
+<CardGroup cols={2}>
+  <Card title="Agent Registry" icon="shield">
+    Every agent gets a cryptographic identity at registration. Full ownership, tier, and scope tracking.
+  </Card>
+  <Card title="Credential Vault" icon="lock">
+    Credentials stored with AES-256-GCM encryption. Automatic rotation and revocation with full audit trail.
+  </Card>
+  <Card title="SIEM Events" icon="bell">
+    Every agent action logged in real time. Policy violations, anomalies, and kill switch events surfaced immediately.
+  </Card>
+  <Card title="Kill Switch" icon="bolt">
+    Revoke any agent instantly — token blacklisted, vault sealed, SIEM event logged. One click.
+  </Card>
+</CardGroup>
+
+## How It Works
+
+1. **Install the SDK** in your AI agent's codebase
+2. **Register the agent** — it appears in your NullBridge dashboard immediately
+3. **Monitor** — every action is logged, anomalies are detected automatically
+4. **Control** — kill, restore, or rotate credentials from the dashboard at any time
+
+## Architecture
+
+NullBridge runs inside your infrastructure. There is no shared SaaS database — your data stays yours.
+
+- **Dashboard** — `app.nullbridge.ai`
+- **API** — `api.nullbridge.ai`
+- **SDK** — `@nullbridge/sdk` on npm
+- **License** — validated on startup, rechecked every 24 hours
+
+## Contact
+
+- Email: [brian@nullbridge.ai](mailto:brian@nullbridge.ai)
+- Website: [nullbridge.ai](https://nullbridge.ai)

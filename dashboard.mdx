@@ -1,0 +1,105 @@
+---
+title: Dashboard Guide
+description: Using the NullBridge dashboard at app.nullbridge.ai
+---
+
+## Accessing the Dashboard
+
+Go to [app.nullbridge.ai](https://app.nullbridge.ai) and sign in with your credentials.
+
+---
+
+## Console
+
+The Console is your home view showing:
+
+- **Total Agents** — all agents registered in your tenant
+- **Active** — agents currently running
+- **Suspended** — agents that have been killed or auto-suspended
+- **Vault Leases** — open credential leases
+- **IDP Critical** — critical identity events
+- **PAM Agents** — T4 privileged agents
+
+The **Risk Board** shows your top 5 agents by risk score. The **Live Events** panel streams SIEM events in real time.
+
+---
+
+## Agent Registry
+
+### Columns
+
+| Column | Description |
+|--------|-------------|
+| Agent | Name and unique ID |
+| Tier | T1 (stateless) through T4 (privileged) |
+| Status | Active, Suspended, or Deprovisioned |
+| Risk | Risk score 0–100 |
+| Credential | Credential type for this tier |
+| Env | prod, staging, or dev |
+| IdP | Green = token active, Red = revoked |
+| Vault | Green = lease open, Red = sealed |
+| Last Seen | Last heartbeat timestamp |
+
+### Provisioning an Agent
+
+Click **+ Provision Agent** and complete the 3-step wizard:
+
+1. **Identity** — name, tier, owner, team, environment, justification
+2. **Scopes** — declare minimum required permissions
+3. **Review** — confirm before provisioning
+
+### Kill Switch
+
+Click **Kill** on any active agent to immediately revoke its token, seal the vault lease, and log critical SIEM events.
+
+### Restore
+
+Click **Restore** to reinstate a suspended agent with a fresh token and vault lease.
+
+---
+
+## SIEM Events
+
+Filter by severity: **All**, **Info**, **Warn**, **Critical**
+
+| Type | Description |
+|------|-------------|
+| `PROVISION` | Agent registered |
+| `KILL_SWITCH` | Kill switch activated |
+| `RESTORE` | Agent reinstated |
+| `SECRET_ROTATE` | Vault secret rotated |
+| `ANOMALY` | Behavioral anomaly detected |
+| `AUTO_SUSPEND` | Agent auto-suspended |
+| `POLICY_VIOLATION` | Agent action blocked |
+
+---
+
+## Policies
+
+| Policy | Severity |
+|--------|----------|
+| No Static Credentials | Critical |
+| Owner Required | Critical |
+| Scope Declared at Registration | High |
+| T4 Requires PAM JIT Only | Critical |
+| Anomaly Auto-Suspend at 3σ | High |
+| Quarterly Attestation | Medium |
+
+---
+
+## Settings
+
+- **Anomaly Detection** — warning and auto-suspend thresholds
+- **Token TTL by Tier** — token lifetime per tier
+- **Session & Attestation** — session length and attestation interval
+- **Notifications** — email alerts configuration
+
+---
+
+## Users
+
+| Role | Permissions |
+|------|-------------|
+| Admin | Full access including user management |
+| Operator | Provision, kill, restore, rotate agents |
+| Viewer | Read-only access |

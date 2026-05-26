@@ -1,0 +1,97 @@
+---
+title: Quickstart
+description: Register your first AI agent in under 5 minutes
+---
+
+## 1. Get a License Key
+
+Contact [brian@nullbridge.ai](mailto:brian@nullbridge.ai) to obtain a license key. Your key will look like:
+
+```
+NB-XXXX-XXXX-XXXX-XXXX
+```
+
+## 2. Install the SDK
+
+```bash
+npm install @nullbridge/sdk
+```
+
+Requires Node.js 18+.
+
+## 3. Set Your License Key
+
+```bash
+export NULLBRIDGE_LICENSE_KEY=NB-XXXX-XXXX-XXXX-XXXX
+```
+
+Or add it to your `.env` file:
+
+```
+NULLBRIDGE_LICENSE_KEY=NB-XXXX-XXXX-XXXX-XXXX
+```
+
+## 4. Register Your First Agent
+
+```javascript
+import { NullBridge } from '@nullbridge/sdk';
+
+const nb = new NullBridge({
+  licenseKey: process.env.NULLBRIDGE_LICENSE_KEY,
+});
+
+await nb.init();
+
+const agent = await nb.agents.register({
+  id:     'my-agent-001',
+  name:   'My First Agent',
+  type:   'llm',
+  model:  'gpt-4o',
+  scopes: ['read:claims', 'write:reports'],
+  metadata: {
+    team:        'engineering',
+    environment: 'prod',
+    owner_email: 'you@company.com',
+  },
+});
+
+console.log('Agent registered:', agent.id);
+```
+
+## 5. Log Your First Action
+
+```javascript
+await agent.logAction('process_claim', {
+  claimId: 'CLM-001',
+  amount:  15000,
+  outcome: 'approved',
+});
+```
+
+## 6. View in Dashboard
+
+Go to [app.nullbridge.ai](https://app.nullbridge.ai) and log in. Your agent appears in the **Agent Registry** tab immediately with a live **Last Seen** timestamp.
+
+## 7. Graceful Shutdown
+
+```javascript
+process.on('SIGTERM', async () => {
+  await nb.shutdown();
+  process.exit(0);
+});
+```
+
+## What Happens Automatically
+
+Once registered, NullBridge handles everything in the background:
+
+- **Heartbeat** — pings every 60 seconds to keep Last Seen current
+- **License recheck** — validates your license every 24 hours
+- **Anomaly detection** — builds a behavioral baseline and alerts on deviations
+- **Audit trail** — every `logAction` call is logged with timestamp and context
+
+## Next Steps
+
+- [SDK Reference](/sdk-reference) — full API documentation
+- [Dashboard Guide](/dashboard) — using the NullBridge dashboard
+- [Email Alerts](/alerts) — configure kill switch and anomaly notifications

@@ -1,0 +1,205 @@
+---
+title: SDK Reference
+description: Complete reference for @nullbridge/sdk
+---
+
+## Installation
+
+```bash
+npm install @nullbridge/sdk
+```
+
+## Initialization
+
+```javascript
+import { NullBridge } from '@nullbridge/sdk';
+
+const nb = new NullBridge({
+  licenseKey:    process.env.NULLBRIDGE_LICENSE_KEY, // required
+  apiUrl:        'https://api.nullbridge.ai',         // default
+  skipLicense:   false,    // set true for local dev only
+  autoShutdown:  true,     // shut down if license is revoked
+  checkInterval: 86400000, // license recheck interval ms (default: 24h)
+  debug:         false,    // enable verbose logging
+});
+
+await nb.init();
+```
+
+---
+
+## nb.agents
+
+### `nb.agents.register(options)`
+
+Register an AI agent with NullBridge. The agent appears immediately in your dashboard.
+
+```javascript
+const agent = await nb.agents.register({
+  id:     'fraud-detector-001',  // required — stable unique identifier
+  name:   'Fraud Detector',      // required — display name
+  type:   'llm',                 // required — 'llm' | 'rpa' | 'workflow' | 'custom'
+  model:  'gpt-4o',              // optional
+  scopes: ['read:transactions', 'write:alerts'],
+  metadata: {
+    team:        'risk',
+    environment: 'prod',
+    owner_email: 'team@company.com',
+  },
+  heartbeatInterval: 60000,
+});
+```
+
+### `agent.logAction(action, details?)`
+
+```javascript
+await agent.logAction('analyze_transaction', {
+  txId:   'TX-1234',
+  amount: 5000,
+  result: 'approved',
+});
+```
+
+### `agent.hasScope(scope)`
+
+```javascript
+if (!agent.hasScope('write:alerts')) {
+  throw new Error('Agent not authorized');
+}
+```
+
+### `agent.deregister()`
+
+```javascript
+await agent.deregister();
+```
+
+---
+
+## nb.audit
+
+### `nb.audit.log(event)`
+
+```javascript
+await nb.audit.log({
+  agentId:     agent.id,
+  agentName:   agent.name,
+  action:      'process_claim',
+  resource:    'claim:CLM-001',
+  outcome:     'success',
+  details:     { amount: 15000 },
+  ip:          req.ip,
+  duration_ms: 1240,
+});
+```
+
+### `nb.audit.batch(events)`
+
+```javascript
+await nb.audit.batch([
+  { agentId: agent.id, agentName: agent.name, action: 'read_record',  outcome: 'success' },
+  { agentId: agent.id, agentName: agent.name, action: 'write_report', outcome: 'success' },
+]);
+```
+
+### `nb.audit.logViolation(agentId, agentName, action, reason)`
+
+```javascript
+await nb.audit.logViolation(agent.id, agent.name, 'delete_record', 'scope_denied');
+```
+
+---
+
+## nb.credentials
+
+### `nb.credentials.store(options)`
+
+```javascript
+const credId = await nb.credentials.store({
+  agentId: agent.id,
+  name:    'openai-api-key',
+  value:   process.env.OPENAI_API_KEY,
+  type:    'api_key',
+  ttl:     86400,
+});
+```
+
+### `nb.credentials.get(credId)`
+
+```javascript
+const apiKey = await nb.credentials.get(credId);
+```
+
+### `nb.credentials.rotate(credId, newValue)`
+
+```javascript
+await nb.credentials.rotate(credId, newApiKey);
+```
+
+### `nb.credentials.revoke(credId)`
+
+```javascript
+await nb.credentials.revoke(credId);
+```
+
+---
+
+## nb.anomaly
+
+### `nb.anomaly.record(agentId, metric, value)`
+
+```javascript
+nb.anomaly.record(agent.id, 'api_calls_per_minute', 14);
+nb.anomaly.record(agent.id, 'tokens_used', 3200);
+```
+
+### `nb.anomaly.onAlert(handler)`
+
+```javascript
+nb.anomaly.onAlert(alert => {
+  console.error(`Anomaly: ${alert.metric} — z=${alert.zScore}`);
+});
+```
+
+### `nb.anomaly.check(agentId, metric, value)`
+
+```javascript
+const { anomalous, zScore } = nb.anomaly.check(agent.id, 'api_calls', 500);
+```
+
+---
+
+## nb.shutdown()
+
+```javascript
+process.on('SIGTERM', async () => {
+  await nb.shutdown();
+  process.exit(0);
+});
+```
+
+---
+
+## Error Classes
+
+```javascript
+import {
+  NullBridgeLicenseError,
+  NullBridgeApiError,
+  NullBridgeCredentialError,
+} from '@nullbridge/sdk';
+
+try {
+  await nb.init();
+} catch (err) {
+  if (err instanceof NullBridgeLicenseError) {
+    console.error('License invalid:', err.reason);
+  }
+}
+```
+
+| Error | When thrown |
+|-------|------------|
+| `NullBridgeLicenseError` | License is invalid, expired, or suspended |
+| `NullBridgeApiError` | API returns an error response |
+| `NullBridgeCredentialError` | Credential operation fails |
