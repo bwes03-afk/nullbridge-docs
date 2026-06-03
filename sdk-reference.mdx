@@ -1,6 +1,6 @@
 ---
-title: SDK Reference
-description: Complete reference for @nullbridge/sdk
+title: "SDK Reference"
+description: "Complete reference for the @nullbridge/sdk package"
 ---
 
 ## Installation
@@ -9,197 +9,189 @@ description: Complete reference for @nullbridge/sdk
 npm install @nullbridge/sdk
 ```
 
-## Initialization
+**Requirements:** Node.js 18+, ESM or CommonJS
 
-```javascript
-import { NullBridge } from '@nullbridge/sdk';
+---
 
-const nb = new NullBridge({
-  licenseKey:    process.env.NULLBRIDGE_LICENSE_KEY, // required
-  apiUrl:        'https://api.nullbridge.ai',         // default
-  skipLicense:   false,    // set true for local dev only
-  autoShutdown:  true,     // shut down if license is revoked
-  checkInterval: 86400000, // license recheck interval ms (default: 24h)
-  debug:         false,    // enable verbose logging
-});
+## NullBridge class
 
+### Constructor
+
+```js
+import pkg from '@nullbridge/sdk';
+const { NullBridge } = pkg;
+
+const nb = new NullBridge(config);
+```
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `licenseKey` | `string` | Yes | Your NullBridge license key |
+| `apiUrl` | `string` | No | API base URL (default: `https://api.nullbridge.ai`) |
+| `serverUrl` | `string` | No | License server URL |
+| `skipLicense` | `boolean` | No | Skip license check for local dev |
+| `autoShutdown` | `boolean` | No | Auto-exit if license is revoked (default: `true`) |
+| `checkInterval` | `number` | No | License recheck interval in ms (default: 24h) |
+| `debug` | `boolean` | No | Enable verbose logging |
+
+---
+
+### `nb.init()`
+
+Validates the license and starts background services. Call once on application startup.
+
+```js
 await nb.init();
+```
+
+**Throws:** `NullBridgeLicenseError` if the license is invalid or expired.
+
+---
+
+### `nb.shutdown()`
+
+Gracefully shuts down — flushes logs, stops heartbeats and license watchers.
+
+```js
+await nb.shutdown();
+```
+
+---
+
+### `nb.getLicenseInfo()`
+
+Returns the current license data.
+
+```js
+const info = nb.getLicenseInfo();
+// { customer: 'Acme Corp', plan: 'starter', ... }
+```
+
+---
+
+### `nb.getVersion()`
+
+Returns the SDK version string.
+
+```js
+nb.getVersion(); // '1.0.5'
 ```
 
 ---
 
 ## nb.agents
 
-### `nb.agents.register(options)`
+### `nb.agents.register(agent)`
 
-Register an AI agent with NullBridge. The agent appears immediately in your dashboard.
+Registers an AI agent with NullBridge. The agent will appear in the Agent Registry and SIEM events will be logged.
 
-```javascript
+```js
 const agent = await nb.agents.register({
-  id:     'fraud-detector-001',  // required — stable unique identifier
-  name:   'Fraud Detector',      // required — display name
-  type:   'llm',                 // required — 'llm' | 'rpa' | 'workflow' | 'custom'
-  model:  'gpt-4o',              // optional
-  scopes: ['read:transactions', 'write:alerts'],
+  id: 'my-agent-001',
+  name: 'MyAgent',
+  type: 'automation',
+  scopes: ['read:tasks', 'write:reports'],
   metadata: {
-    team:        'risk',
+    owner_email: 'you@company.com',
+    team: 'Engineering',
     environment: 'prod',
-    owner_email: 'team@company.com',
   },
-  heartbeatInterval: 60000,
 });
 ```
 
-### `agent.logAction(action, details?)`
+**Parameters:**
 
-```javascript
-await agent.logAction('analyze_transaction', {
-  txId:   'TX-1234',
-  amount: 5000,
-  result: 'approved',
-});
-```
+| Field | Type | Required | Description |
+|-------|------|----------|-------------|
+| `id` | `string` | Yes | Unique agent identifier |
+| `name` | `string` | Yes | Display name shown in dashboard |
+| `type` | `string` | Yes | Agent type (e.g. `automation`, `orchestrator`) |
+| `scopes` | `string[]` | No | Minimum required permission scopes |
+| `metadata.owner_email` | `string` | No | Owner email address |
+| `metadata.team` | `string` | No | Team name |
+| `metadata.environment` | `string` | No | `dev`, `staging`, or `prod` |
 
-### `agent.hasScope(scope)`
+**Returns:** Agent object with `id`, `name`, `status`, and registration details.
 
-```javascript
-if (!agent.hasScope('write:alerts')) {
-  throw new Error('Agent not authorized');
-}
-```
-
-### `agent.deregister()`
-
-```javascript
-await agent.deregister();
-```
+<Note>
+  If an agent with the same `id` already exists, it will be updated rather than duplicated.
+</Note>
 
 ---
 
-## nb.audit
+## Available scopes
 
-### `nb.audit.log(event)`
-
-```javascript
-await nb.audit.log({
-  agentId:     agent.id,
-  agentName:   agent.name,
-  action:      'process_claim',
-  resource:    'claim:CLM-001',
-  outcome:     'success',
-  details:     { amount: 15000 },
-  ip:          req.ip,
-  duration_ms: 1240,
-});
-```
-
-### `nb.audit.batch(events)`
-
-```javascript
-await nb.audit.batch([
-  { agentId: agent.id, agentName: agent.name, action: 'read_record',  outcome: 'success' },
-  { agentId: agent.id, agentName: agent.name, action: 'write_report', outcome: 'success' },
-]);
-```
-
-### `nb.audit.logViolation(agentId, agentName, action, reason)`
-
-```javascript
-await nb.audit.logViolation(agent.id, agent.name, 'delete_record', 'scope_denied');
-```
+| Scope | Description |
+|-------|-------------|
+| `read:claims` | Read identity claims |
+| `write:claims` | Write identity claims |
+| `read:policy` | Read policies |
+| `write:policy` | Write policies |
+| `invoke:workflow` | Trigger workflows |
+| `read:customers` | Read customer data |
+| `write:customers` | Write customer data |
+| `read:repos` | Read repositories |
+| `write:reports` | Write reports |
+| `read:tasks` | Read tasks |
+| `write:tasks` | Write tasks |
+| `read:database` | Read database |
+| `admin:infra` | Infrastructure admin |
+| `read:secrets` | Read secrets |
+| `invoke:deploy` | Trigger deployments |
+| `read:audit` | Read audit logs |
 
 ---
 
-## nb.credentials
+## Agent tiers
 
-### `nb.credentials.store(options)`
+Agents are automatically assigned a tier based on their scopes and risk profile:
 
-```javascript
-const credId = await nb.credentials.store({
-  agentId: agent.id,
-  name:    'openai-api-key',
-  value:   process.env.OPENAI_API_KEY,
-  type:    'api_key',
-  ttl:     86400,
-});
-```
-
-### `nb.credentials.get(credId)`
-
-```javascript
-const apiKey = await nb.credentials.get(credId);
-```
-
-### `nb.credentials.rotate(credId, newValue)`
-
-```javascript
-await nb.credentials.rotate(credId, newApiKey);
-```
-
-### `nb.credentials.revoke(credId)`
-
-```javascript
-await nb.credentials.revoke(credId);
-```
+| Tier | Label | Credential | Max TTL |
+|------|-------|------------|---------|
+| T1 | Stateless | OAuth2 JWT | 900s |
+| T2 | Task-Scoped | SPIFFE/SVID | 1800s |
+| T3 | Orchestrator | Vault Dynamic | 3600s |
+| T4 | Privileged | PAM JIT | 7200s |
+| T5 | Sub-Agent | Child Token | 600s |
 
 ---
 
-## nb.anomaly
+## Error types
 
-### `nb.anomaly.record(agentId, metric, value)`
-
-```javascript
-nb.anomaly.record(agent.id, 'api_calls_per_minute', 14);
-nb.anomaly.record(agent.id, 'tokens_used', 3200);
+```js
+import pkg from '@nullbridge/sdk';
+const { NullBridgeLicenseError, NullBridgeApiError, NullBridgeCredentialError } = pkg;
 ```
 
-### `nb.anomaly.onAlert(handler)`
+| Error | Thrown when |
+|-------|-------------|
+| `NullBridgeLicenseError` | License is invalid, expired, or missing |
+| `NullBridgeApiError` | API request fails |
+| `NullBridgeCredentialError` | Credential operation fails |
 
-```javascript
-nb.anomaly.onAlert(alert => {
-  console.error(`Anomaly: ${alert.metric} — z=${alert.zScore}`);
-});
-```
-
-### `nb.anomaly.check(agentId, metric, value)`
-
-```javascript
-const { anomalous, zScore } = nb.anomaly.check(agent.id, 'api_calls', 500);
-```
-
----
-
-## nb.shutdown()
-
-```javascript
-process.on('SIGTERM', async () => {
-  await nb.shutdown();
-  process.exit(0);
-});
-```
-
----
-
-## Error Classes
-
-```javascript
-import {
-  NullBridgeLicenseError,
-  NullBridgeApiError,
-  NullBridgeCredentialError,
-} from '@nullbridge/sdk';
-
+```js
 try {
   await nb.init();
 } catch (err) {
   if (err instanceof NullBridgeLicenseError) {
-    console.error('License invalid:', err.reason);
+    console.error('License issue:', err.message);
   }
 }
 ```
 
-| Error | When thrown |
-|-------|------------|
-| `NullBridgeLicenseError` | License is invalid, expired, or suspended |
-| `NullBridgeApiError` | API returns an error response |
-| `NullBridgeCredentialError` | Credential operation fails |
+---
+
+## CommonJS usage
+
+```js
+const { NullBridge } = require('@nullbridge/sdk');
+
+async function main() {
+  const nb = new NullBridge({ licenseKey: process.env.NULLBRIDGE_LICENSE_KEY });
+  await nb.init();
+  await nb.agents.register({ id: 'agent-001', name: 'MyAgent', type: 'automation' });
+  await nb.shutdown();
+}
+
+main().catch(console.error);
+```
