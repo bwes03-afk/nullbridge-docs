@@ -1,40 +1,84 @@
 ---
-title: Quickstart
-description: Register your first AI agent in under 5 minutes
+title: "Quickstart"
+description: "Register your first AI agent with NullBridge in under 5 minutes"
 ---
 
-## 1. Get a License Key
+## Prerequisites
 
-Contact [brian@nullbridge.ai](mailto:brian@nullbridge.ai) to obtain a license key. Your key will look like:
+Before you begin, make sure you have:
 
-```
-NB-XXXX-XXXX-XXXX-XXXX
-```
+- A NullBridge account (created by your admin in the dashboard)
+- A valid license key (`NB-XXXX-XXXX-XXXX-XXXX`)
+- Node.js 18 or higher
 
-## 2. Install the SDK
+---
+
+## Step 1 — Install the SDK
 
 ```bash
 npm install @nullbridge/sdk
 ```
 
-Requires Node.js 18+.
+---
 
-## 3. Set Your License Key
+## Step 2 — Initialize NullBridge
 
-```bash
-export NULLBRIDGE_LICENSE_KEY=NB-XXXX-XXXX-XXXX-XXXX
+Create a file (e.g. `nullbridge.js`) in your project:
+
+```js
+import pkg from '@nullbridge/sdk';
+const { NullBridge } = pkg;
+
+const nb = new NullBridge({
+  licenseKey: 'NB-XXXX-XXXX-XXXX-XXXX', // your license key
+});
+
+await nb.init();
 ```
 
-Or add it to your `.env` file:
+<Note>
+  Replace `NB-XXXX-XXXX-XXXX-XXXX` with your actual license key. Contact [brian@nullbridge.ai](mailto:brian@nullbridge.ai) if you don't have one.
+</Note>
 
+---
+
+## Step 3 — Register an Agent
+
+```js
+const agent = await nb.agents.register({
+  id: 'my-agent-001',        // unique ID for this agent
+  name: 'MyFirstAgent',      // display name in the dashboard
+  type: 'automation',        // agent type
+  scopes: ['read:tasks'],    // minimum required scopes
+  metadata: {
+    owner_email: 'you@company.com',
+    team: 'Engineering',
+    environment: 'prod',     // dev | staging | prod
+  },
+});
+
+console.log('Agent registered:', agent.id);
 ```
-NULLBRIDGE_LICENSE_KEY=NB-XXXX-XXXX-XXXX-XXXX
+
+Once registered, your agent will appear in the **Agent Registry** on your NullBridge dashboard and a SIEM event will be logged.
+
+---
+
+## Step 4 — Shut down gracefully
+
+```js
+await nb.shutdown();
 ```
 
-## 4. Register Your First Agent
+Call `shutdown()` when your application exits to flush any pending logs and stop heartbeat timers.
 
-```javascript
-import { NullBridge } from '@nullbridge/sdk';
+---
+
+## Full example
+
+```js
+import pkg from '@nullbridge/sdk';
+const { NullBridge } = pkg;
 
 const nb = new NullBridge({
   licenseKey: process.env.NULLBRIDGE_LICENSE_KEY,
@@ -43,55 +87,64 @@ const nb = new NullBridge({
 await nb.init();
 
 const agent = await nb.agents.register({
-  id:     'my-agent-001',
-  name:   'My First Agent',
-  type:   'llm',
-  model:  'gpt-4o',
-  scopes: ['read:claims', 'write:reports'],
+  id: 'invoice-processor-001',
+  name: 'InvoiceProcessor',
+  type: 'automation',
+  scopes: ['read:tasks', 'write:reports'],
   metadata: {
-    team:        'engineering',
+    owner_email: 'ops@company.com',
+    team: 'Finance',
     environment: 'prod',
-    owner_email: 'you@company.com',
   },
 });
 
-console.log('Agent registered:', agent.id);
+console.log('Agent live:', agent.id);
+
+// Your agent logic here...
+
+await nb.shutdown();
 ```
 
-## 5. Log Your First Action
+---
 
-```javascript
-await agent.logAction('process_claim', {
-  claimId: 'CLM-001',
-  amount:  15000,
-  outcome: 'approved',
+## What happens next
+
+After registration:
+
+| System | Action |
+|--------|--------|
+| **Agent Registry** | Agent appears with tier, status, and scopes |
+| **SIEM Events** | `AGENT_REGISTERED` event logged |
+| **Vault** | Credential lease opened |
+| **IDP** | OAuth2 client registered |
+
+Your admin can now monitor, kill, restore, or rotate credentials for this agent from the dashboard.
+
+---
+
+## Environment variable (recommended)
+
+Store your license key as an environment variable instead of hardcoding it:
+
+```bash
+NULLBRIDGE_LICENSE_KEY=NB-XXXX-XXXX-XXXX-XXXX
+```
+
+```js
+const nb = new NullBridge({
+  licenseKey: process.env.NULLBRIDGE_LICENSE_KEY,
 });
 ```
 
-## 6. View in Dashboard
+---
 
-Go to [app.nullbridge.ai](https://app.nullbridge.ai) and log in. Your agent appears in the **Agent Registry** tab immediately with a live **Last Seen** timestamp.
+## Next steps
 
-## 7. Graceful Shutdown
-
-```javascript
-process.on('SIGTERM', async () => {
-  await nb.shutdown();
-  process.exit(0);
-});
-```
-
-## What Happens Automatically
-
-Once registered, NullBridge handles everything in the background:
-
-- **Heartbeat** — pings every 60 seconds to keep Last Seen current
-- **License recheck** — validates your license every 24 hours
-- **Anomaly detection** — builds a behavioral baseline and alerts on deviations
-- **Audit trail** — every `logAction` call is logged with timestamp and context
-
-## Next Steps
-
-- [SDK Reference](/sdk-reference) — full API documentation
-- [Dashboard Guide](/dashboard) — using the NullBridge dashboard
-- [Email Alerts](/alerts) — configure kill switch and anomaly notifications
+<CardGroup cols={2}>
+  <Card title="SDK Reference" icon="code" href="/sdk-reference">
+    Full API reference for all SDK methods
+  </Card>
+  <Card title="Dashboard" icon="gauge" href="https://app.nullbridge.ai">
+    View your agents, SIEM events, and policies
+  </Card>
+</CardGroup>
