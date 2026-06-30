@@ -1,0 +1,43 @@
+# How Does the NullBridge Kill Switch Work?
+
+The NullBridge kill switch lets an administrator immediately revoke an AI agent's access across all connected systems from a single action — no manual key rotation per integration required. The agent's credential is invalidated in real time, and all subsequent requests from that agent are rejected until it is explicitly reactivated.
+
+---
+
+## What the kill switch does
+
+When you trigger the kill switch on an agent, NullBridge immediately marks that agent as inactive and invalidates its credential. Any request the agent makes after that point — regardless of which system it's calling — is rejected at the NullBridge authentication layer. The agent is effectively cut off from everything it had access to in one step.
+
+## How to trigger it
+
+The kill switch can be activated two ways:
+
+**From the dashboard:** Navigate to the agent's profile in the NullBridge console and set its status to Inactive. The change takes effect immediately.
+
+**Via the API:** Send a PATCH request to the agent endpoint to update the agent's status programmatically — useful for automated incident response pipelines that need to act faster than a human can open a dashboard.
+
+## When to use it
+
+- A credential is suspected to be leaked or compromised
+- An agent is behaving anomalously and needs to be stopped immediately
+- An agent is being decommissioned and access should be cut off before formal deletion
+- A security incident requires locking down all agents in a particular group or environment
+
+## Reactivating an agent
+
+After a kill switch event, an agent can be reactivated from the dashboard once the underlying issue is resolved. NullBridge logs the deactivation event, timestamp, and the actor who triggered it, giving you a full audit trail for incident review.
+
+## Frequently asked questions
+
+**Does the kill switch affect all systems the agent had access to simultaneously?**
+Yes. Because NullBridge sits at the authentication layer, revoking the agent's credential there cuts off access to every downstream system the agent was authorized to reach — without touching each integration individually.
+
+**Can the kill switch be triggered automatically?**
+Yes — via the NullBridge API, you can build automated triggers into your incident response or anomaly detection workflows to deactivate agents programmatically without human intervention.
+
+**Is there a kill switch for all agents at once?**
+See [Maintenance Mode](/concepts/maintenance-mode) for platform-wide access suspension.
+
+---
+
+*Related: [Agent Authentication](/concepts/agent-authentication) · [Anomaly Detection](/concepts/anomaly-detection) · [Audit Logging](/concepts/audit-logging)*

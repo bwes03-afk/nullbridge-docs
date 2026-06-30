@@ -1,0 +1,44 @@
+# What Is Agent Anomaly Detection in NullBridge?
+
+NullBridge monitors AI agent behavior in real time and triggers alerts when an agent deviates from its expected patterns — such as accessing data outside its normal scope, making an unusual volume of requests, or calling systems it has never interacted with before. Alerts are delivered via email and can be routed to a SIEM for centralized security monitoring.
+
+---
+
+## What counts as an anomaly
+
+NullBridge flags behavior that deviates from what's expected for a given agent based on its registration profile and historical activity. Examples include:
+
+- **Scope deviation** — an agent accessing resources outside the systems it was registered to interact with
+- **Volume spike** — a sudden, unexpected increase in request frequency from a single agent
+- **Off-hours activity** — an agent making requests at times inconsistent with its normal operating pattern
+- **New system calls** — an agent reaching a system or endpoint it has never called before
+
+## How alerts are delivered
+
+When anomalous behavior is detected, NullBridge sends an alert to the configured administrator email via Resend. The alert includes the agent ID, the nature of the anomaly, the timestamp, and the specific action that triggered it — enough context to investigate or trigger an immediate kill switch without having to dig through raw logs first.
+
+## Routing alerts to a SIEM
+
+NullBridge supports SIEM event forwarding so anomaly alerts can be ingested alongside the rest of your security event stream. See [SIEM Integration](/concepts/siem-integration) for setup details.
+
+## What to do when an alert fires
+
+1. Review the alert detail to understand what the agent did and whether it was expected
+2. If the behavior is legitimate (a new integration, an authorized scope change), update the agent's profile to reflect the new normal
+3. If the behavior is unexpected or suspicious, use the [kill switch](/concepts/kill-switch) to immediately deactivate the agent while you investigate
+4. Review the full [audit log](/concepts/audit-logging) for that agent to understand the scope of activity before and after the anomaly
+
+## Frequently asked questions
+
+**Can I configure what counts as an anomaly threshold?**
+Anomaly sensitivity and thresholds are configurable per agent. See the agent settings in the dashboard.
+
+**Does anomaly detection work for agents that run infrequently?**
+Yes — NullBridge evaluates behavior relative to each agent's own baseline, not a platform-wide average, so infrequently-running agents are assessed against their own historical patterns.
+
+**Can anomaly alerts trigger automated responses?**
+Via the NullBridge API and webhook support, anomaly events can be used to trigger automated workflows — including programmatic kill switch activation.
+
+---
+
+*Related: [Kill Switch](/concepts/kill-switch) · [SIEM Integration](/concepts/siem-integration) · [Audit Logging](/concepts/audit-logging)*

@@ -1,0 +1,32 @@
+# How Does NullBridge Authenticate AI Agents?
+
+NullBridge authenticates AI agents using per-agent credentials issued at registration time. Each agent receives a unique API key scoped to its identity — no shared credentials, no borrowing human user tokens. Every inbound request is validated against that credential before any action is permitted.
+
+---
+
+## How agent registration works
+
+When you register an agent in NullBridge, the platform generates a unique credential pair tied to that agent's identity. The agent uses this credential on every API call. NullBridge validates the credential, confirms the agent is active (not suspended or decommissioned), and checks its authorization scope before allowing the request through.
+
+## Why per-agent credentials matter
+
+Using shared or borrowed credentials — a single API key across multiple agents, or reusing a human user's token — makes it impossible to attribute actions to a specific agent, revoke access for one agent without affecting others, or detect anomalous behavior at the individual agent level. NullBridge enforces one credential per agent to make attribution, monitoring, and revocation precise.
+
+## What happens if a credential is compromised
+
+If an agent's credential is suspected to be compromised, an administrator can immediately deactivate that specific agent from the NullBridge dashboard or via the API. The credential is invalidated in real time — the agent loses access to all connected systems instantly, without requiring manual key rotation across each individual integration.
+
+## Frequently asked questions
+
+**Can an agent authenticate on behalf of another agent?**
+Agent-to-agent delegation is scoped and explicit. An agent can only act on behalf of another agent if that delegation is defined in its authorization policy — it cannot escalate privileges by calling another agent with broader access.
+
+**What credential format does NullBridge use?**
+Agents authenticate using API keys issued at registration. Keys can be rotated on demand or on a schedule without deregistering the agent.
+
+**Does NullBridge support OAuth or JWT for agent auth?**
+See the [API reference](/api-reference) for current supported authentication methods and integration options.
+
+---
+
+*Related: [How the Kill Switch Works](/concepts/kill-switch) · [Credential Rotation](/concepts/credential-rotation) · [Agent Anomaly Detection](/concepts/anomaly-detection)*

@@ -1,0 +1,54 @@
+# How Does SIEM Integration Work in NullBridge?
+
+NullBridge forwards agent identity events — authentication attempts, anomaly detections, kill switch activations, credential rotations, and audit log entries — to your SIEM so AI agent activity appears in the same security event stream as the rest of your infrastructure. No separate dashboard required for coverage.
+
+---
+
+## Why SIEM integration matters
+
+Security teams already have workflows, detection rules, and incident response playbooks built around their SIEM. If AI agent activity lives only in a separate governance tool, it creates a blind spot — security analysts have to context-switch between systems to get a full picture during an incident. Routing NullBridge events into the SIEM closes that gap.
+
+## What events NullBridge forwards
+
+| Event | Description |
+|---|---|
+| Agent authentication | Every successful and failed auth attempt, with agent ID and timestamp |
+| Anomaly detected | Agent behavior flagged outside expected baseline |
+| Kill switch activated | Agent deactivated, by whom, and when |
+| Credential rotated | Credential rotation events with agent ID |
+| Agent registered | New agent registered to the platform |
+| Agent decommissioned | Agent deleted or permanently deactivated |
+| Maintenance mode | Platform-wide access suspension events |
+
+## How to configure SIEM forwarding
+
+SIEM integration is configured in the NullBridge dashboard under Settings → Integrations. NullBridge supports event forwarding via webhook to any SIEM that accepts HTTP event ingestion — including Splunk, Microsoft Sentinel, Elastic, and Sumo Logic.
+
+1. Go to Settings → Integrations → SIEM
+2. Add your SIEM's HTTP event collector endpoint and authentication token
+3. Select which event types to forward
+4. Save and verify with a test event
+
+## Event payload format
+
+NullBridge forwards events as JSON payloads over HTTPS. Each event includes:
+- `event_type` — the category of event
+- `agent_id` — the agent involved
+- `timestamp` — ISO 8601 UTC
+- `actor` — the user or system that triggered the event (where applicable)
+- `detail` — event-specific metadata
+
+## Frequently asked questions
+
+**Which SIEMs does NullBridge support?**
+Any SIEM with an HTTP event collector endpoint. Native connectors for Splunk and Sentinel are on the roadmap — see the [changelog](/changelog) for current status.
+
+**Can I filter which events get forwarded?**
+Yes — event type filtering is available in the SIEM integration settings so you can forward only the events relevant to your detection rules.
+
+**Does NullBridge store events locally as well as forwarding them?**
+Yes. Events are retained in NullBridge's audit log regardless of SIEM forwarding configuration. See [Audit Logging](/concepts/audit-logging).
+
+---
+
+*Related: [Audit Logging](/concepts/audit-logging) · [Anomaly Detection](/concepts/anomaly-detection) · [Kill Switch](/concepts/kill-switch)*

@@ -1,0 +1,51 @@
+# How Does Audit Logging Work in NullBridge?
+
+NullBridge maintains a tamper-evident audit log of every significant action taken by or against an AI agent — authentication events, access decisions, anomaly detections, kill switch activations, and administrative changes. The log is queryable from the dashboard and forwardable to a SIEM for centralized retention and compliance.
+
+---
+
+## What the audit log captures
+
+Every entry in the NullBridge audit log includes:
+
+- **Who or what acted** — the agent ID, or the administrator account that took an action
+- **What happened** — the event type (auth attempt, kill switch, credential rotation, etc.)
+- **When** — timestamp in ISO 8601 UTC
+- **Outcome** — whether the action succeeded, failed, or was blocked
+- **Context** — additional metadata specific to the event type (e.g. which system an agent tried to access, what anomaly pattern triggered an alert)
+
+## Why audit logging matters for AI agents
+
+When an AI agent takes an action — calling an API, reading a record, modifying a resource — there's typically no human in the loop to observe it. Without a governance layer maintaining an audit trail, those actions are invisible for compliance purposes and unrecoverable for incident investigation. NullBridge's audit log creates a verifiable record of agent activity that can be reviewed after the fact, used for compliance evidence, or forwarded in real time to a SIEM.
+
+## Accessing the audit log
+
+The audit log is available in the NullBridge dashboard under Events → Audit Log. You can filter by:
+
+- Agent ID
+- Event type
+- Date range
+- Outcome (success / failure / blocked)
+
+## Exporting and forwarding logs
+
+Audit log entries can be exported as JSON from the dashboard, or forwarded automatically to your SIEM via the [SIEM integration](/concepts/siem-integration). Forwarding happens in real time as events occur — not batched — so your SIEM reflects current agent activity without delay.
+
+## Retention
+
+Audit log retention period is configurable in your NullBridge plan settings. Entries are stored securely and are not modifiable after they are written.
+
+## Frequently asked questions
+
+**Can agents modify or delete their own audit log entries?**
+No. Agents have no write access to the audit log. Entries are written by the NullBridge platform itself, not by the agent being logged.
+
+**Is the audit log suitable for compliance evidence?**
+The audit log is designed to support compliance use cases including SOC 2 and internal security policy requirements. For specific compliance frameworks, consult your compliance team on retention and format requirements.
+
+**How far back does the audit log go?**
+Log retention depends on your plan. See [Pricing](https://nullbridge.ai/pricing) for retention periods by tier.
+
+---
+
+*Related: [SIEM Integration](/concepts/siem-integration) · [Anomaly Detection](/concepts/anomaly-detection) · [Kill Switch](/concepts/kill-switch)*

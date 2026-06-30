@@ -1,0 +1,55 @@
+# How Does Bulk Agent Import Work in NullBridge?
+
+NullBridge supports bulk agent registration via CSV upload, allowing you to onboard multiple agents in a single operation rather than registering them one at a time through the dashboard or API. Each agent in the import gets its own unique credential and is immediately governed by NullBridge's authentication and monitoring layer once the import completes.
+
+---
+
+## When to use bulk import
+
+Bulk import is useful when:
+
+- You're onboarding NullBridge to an environment that already has multiple running agents
+- You're deploying a new fleet of agents as part of a project rollout
+- You need to register agents programmatically as part of a CI/CD or infrastructure-as-code process and CSV is the most convenient format
+
+## CSV format
+
+The import CSV requires the following columns:
+
+| Column | Required | Description |
+|---|---|---|
+| `name` | Yes | Display name for the agent |
+| `description` | No | Optional notes about the agent's purpose |
+| `group` | No | Group or team the agent belongs to |
+| `scope` | No | Comma-separated list of authorized scopes |
+
+Download the CSV template from the dashboard under Agents → Import → Download Template.
+
+## How to run an import
+
+1. Go to **Agents → Import** in the NullBridge dashboard
+2. Download the CSV template and populate your agent data
+3. Upload the completed CSV
+4. Review the import preview — NullBridge will flag any rows with missing required fields or formatting issues before committing
+5. Confirm the import
+
+Once confirmed, NullBridge registers each agent and generates a unique credential for each. Credentials are returned in a downloadable results CSV immediately after import — this is the only time the credentials are shown in bulk, so download and store them securely before closing the page.
+
+## What happens after import
+
+Each imported agent is immediately active in NullBridge and governed by the same authentication, monitoring, and audit logging as agents registered individually. If you specified group or scope assignments in the CSV, those are applied at registration time.
+
+## Frequently asked questions
+
+**Is there a limit on how many agents can be imported at once?**
+See your plan limits in the NullBridge dashboard under Settings → Plan.
+
+**What happens if a row in the CSV fails validation?**
+Failed rows are flagged in the import preview before the import runs. You can correct the CSV and re-upload — successfully validated rows are not partially committed.
+
+**Can I update existing agents via CSV import?**
+Bulk import is for new agent registration only. Updating existing agents in bulk is available via the API.
+
+---
+
+*Related: [Agent Authentication](/concepts/agent-authentication) · [Credential Rotation](/concepts/credential-rotation) · [API Reference](/api-reference)*
