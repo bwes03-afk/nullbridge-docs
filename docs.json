@@ -16,6 +16,18 @@
             "pages": ["introduction", "quickstart"]
           },
           {
+            "group": "Concepts",
+            "pages": [
+              "concepts/agent-authentication",
+              "concepts/kill-switch",
+              "concepts/credential-rotation",
+              "concepts/anomaly-detection",
+              "concepts/siem-integration",
+              "concepts/audit-logging",
+              "concepts/bulk-agent-import"
+            ]
+          },
+          {
             "group": "Reference",
             "pages": ["sdk-reference", "dashboard", "alerts"]
           }
